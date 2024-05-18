@@ -2,8 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import joblib
-import sklearn
-
+from sklearn.preprocessing import MinMaxScaler
 # Load pre-trained logistic regression model
 model = joblib.load('logistic_regression_model.pkl')
 
@@ -77,6 +76,11 @@ input_df.drop(columns = ["Property_Area" , "edu"] , inplace  = True)
 
 if 'Unnamed: 0' in input_df.columns:
     input_df = input_df.drop(columns=['Unnamed: 0'])
+
+X_new = input_df.copy()
+scale = ["ApplicantIncome","CoapplicantIncome","LoanAmount"]
+X_new[scale] = MinMaxScaler().fit_transform(input_df[scale])
+input_df = X_new
 
 # Display user input
 st.subheader('User Input parameters')
