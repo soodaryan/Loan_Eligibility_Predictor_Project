@@ -3,14 +3,9 @@ import numpy as np
 import pandas as pd
 import joblib
 from sklearn.preprocessing import MinMaxScaler
-# Load pre-trained logistic regression model
+
 model = joblib.load('logistic_regression_model.pkl')
-
-# Title of the app
 st.title('Loan Eligibility Predictor')
-
-# # Input fields for the user to fill in the details
-# st.sidebar.header('User Input Parameters')
 
 def user_input_features():
     Loan_ID = st.text_input("Enter Loan Id")
@@ -44,8 +39,6 @@ def user_input_features():
 
 input_df = user_input_features()
 
-# # Preprocess the input data to match the model training format
-# # Note: Ensure this preprocessing step matches your model training process
 input_df['Gender_Male'] = input_df['Gender_Male'].map({'Male': 1, 'Female': 0, 'Other': 2})
 input_df['Married_Yes'] = input_df['Married_Yes'].map({'Yes': 1, 'No': 0})
 input_df['Dependents'] = input_df['Dependents'].astype(str)
@@ -56,13 +49,11 @@ for col_name in cols :
     if col_name not in dependents_dummies.columns:
         dependents_dummies[col_name] = 0
 
-# Concatenate the dummy columns to the original DataFrame
 input_df = pd.concat([input_df, dependents_dummies], axis=1)
 input_df.drop(columns = "Dependents" , inplace = True)
 
 input_df.loc[: , 'Education_Graduate'] = input_df.loc[: ,'edu'].map({'Graduate': 1, 'Not Graduate': 0})
 input_df['Self_Employed_Yes'] = input_df['Self_Employed_Yes'].map({'Yes': 1, 'No': 0})
-# input_df['Property_Area'] = input_df['Property_Area'].map({'Urban': 0, 'Semiurban': 1, 'Rural': 2})
 
 input_df['Property_Area'] = input_df['Property_Area'].astype(str)
 property_area_dummies = pd.get_dummies(input_df['Property_Area'], prefix='Property_Area').astype(int)
@@ -76,22 +67,18 @@ input_df.drop(columns = ["Property_Area" , "edu"] , inplace  = True)
 
 if 'Unnamed: 0' in input_df.columns:
     input_df = input_df.drop(columns=['Unnamed: 0'])
-
+    
+loaded_scaler = joblib.load('my_scaler.pkl') 
 X_new = input_df.copy()
 scale = ["ApplicantIncome","CoapplicantIncome","LoanAmount"]
-X_new[scale] = MinMaxScaler().fit_transform(input_df[scale])
+X_new[scale] = loaded_scaler.transform(input_df[scale])
 input_df = X_new
 
-# Display user input
-st.subheader('User Input parameters')
+st.subheader('User Input parameters after preprocessing')
 st.write(input_df)
 
-# Make predictions
 final_cols = ['ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term', 'Credit_History', 'Gender_Male', 'Married_Yes', 'Dependents_0', 'Dependents_1', 'Dependents_2', 'Dependents_3+', 'Education_Graduate', 'Self_Employed_Yes', 'Property_Area_Rural', 'Property_Area_Semiurban', 'Property_Area_Urban']
 prediction = model.predict(input_df[final_cols])
-# prediction_proba = model.predict_proba(input_df)
-
-# Display the prediction
 
 st.subheader('Prediction')
 loan_status = np.array(['Not Eligible', 'Eligible'])
@@ -103,9 +90,5 @@ st.markdown(
     </div>
     """, unsafe_allow_html=True
 )
-# st.write(loan_status[prediction])
-# # Display the prediction probability
-# st.subheader('Prediction Probability')
-# st.write(prediction_proba)
 
     
