@@ -83,19 +83,6 @@ scale = ["ApplicantIncome","CoapplicantIncome","LoanAmount"]
 X_new[scale] = loaded_scaler.transform(input_df[scale])
 input_df = X_new
 
-# prediction = model.predict(input_df[final_cols])
-
-# st.subheader('Prediction')
-# loan_status = np.array(['Not Eligible', 'Eligible'])
-
-# st.markdown(
-#     f"""
-#     <div style="padding: 10px; border: 1px solid #000; border-radius: 5px; font-size: 20px;">
-#         {loan_status[prediction][0]}
-#     </div>
-#     """, unsafe_allow_html=True
-# )
-
 if st.button('Submit'):
     prediction = model.predict(input_df[final_cols])
 
