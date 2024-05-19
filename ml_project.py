@@ -14,9 +14,9 @@ def user_input_features():
     Dependents = st.selectbox('Dependents', ('0', '1', '2', '3+'))
     Education = st.selectbox('Education', ('Graduate', 'Not Graduate'))
     Self_Employed = st.selectbox('Self Employed', ('Yes', 'No'))
-    ApplicantIncome = st.number_input('Applicant Income',value=0.0)
-    CoapplicantIncome = st.number_input('Coapplicant Income', value=0.0)
-    LoanAmount = st.number_input('Loan Amount', value=0.0)
+    ApplicantIncome = st.number_input('Applicant Income',value=0)
+    CoapplicantIncome = st.number_input('Coapplicant Income', value=0)
+    LoanAmount = st.number_input('Loan Amount', value=0)
     Loan_Amount_Term = st.number_input('Loan Amount Term', value=360)
     Credit_History = st.selectbox('Credit History', (1, 0))
     Property_Area = st.selectbox('Property Area', ('Urban', 'Semiurban', 'Rural'))
@@ -65,6 +65,15 @@ for area in ['Urban', 'Semiurban', 'Rural']:
 input_df = pd.concat([input_df, property_area_dummies], axis=1)
 input_df.drop(columns = ["Property_Area" , "edu"] , inplace  = True) 
 
+final_cols = ['ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term', 'Credit_History', 'Gender_Male', 'Married_Yes', 'Dependents_0', 'Dependents_1', 'Dependents_2', 'Dependents_3+', 'Education_Graduate', 'Self_Employed_Yes', 'Property_Area_Rural', 'Property_Area_Semiurban', 'Property_Area_Urban']
+
+st.subheader('User Input parameters')
+st.write(input_df[final_cols])
+
+input_df["ApplicantIncome"] = np.sqrt(input_df.ApplicantIncome)
+input_df["CoapplicantIncome"] = np.sqrt(input_df.CoapplicantIncome)
+input_df["LoanAmount"] = np.sqrt(input_df.LoanAmount)
+
 if 'Unnamed: 0' in input_df.columns:
     input_df = input_df.drop(columns=['Unnamed: 0'])
     
@@ -74,21 +83,31 @@ scale = ["ApplicantIncome","CoapplicantIncome","LoanAmount"]
 X_new[scale] = loaded_scaler.transform(input_df[scale])
 input_df = X_new
 
-st.subheader('User Input parameters after preprocessing')
-st.write(input_df)
+# prediction = model.predict(input_df[final_cols])
 
-final_cols = ['ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term', 'Credit_History', 'Gender_Male', 'Married_Yes', 'Dependents_0', 'Dependents_1', 'Dependents_2', 'Dependents_3+', 'Education_Graduate', 'Self_Employed_Yes', 'Property_Area_Rural', 'Property_Area_Semiurban', 'Property_Area_Urban']
-prediction = model.predict(input_df[final_cols])
+# st.subheader('Prediction')
+# loan_status = np.array(['Not Eligible', 'Eligible'])
 
-st.subheader('Prediction')
-loan_status = np.array(['Not Eligible', 'Eligible'])
+# st.markdown(
+#     f"""
+#     <div style="padding: 10px; border: 1px solid #000; border-radius: 5px; font-size: 20px;">
+#         {loan_status[prediction][0]}
+#     </div>
+#     """, unsafe_allow_html=True
+# )
 
-st.markdown(
-    f"""
-    <div style="padding: 10px; border: 1px solid #000; border-radius: 5px; font-size: 20px;">
-        {loan_status[prediction][0]}
-    </div>
-    """, unsafe_allow_html=True
-)
+if st.button('Submit'):
+    prediction = model.predict(input_df[final_cols])
+
+    st.subheader('Prediction')
+    loan_status = np.array(['Not Eligible', 'Eligible'])
+
+    st.markdown(
+        f"""
+        <div style="padding: 10px; border: 1px solid #000; border-radius: 5px; font-size: 20px;">
+            {loan_status[prediction][0]}
+        </div>
+        """, unsafe_allow_html=True
+    )
 
     
