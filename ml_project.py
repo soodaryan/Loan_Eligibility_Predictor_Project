@@ -9,7 +9,7 @@ st.title('Loan Eligibility Predictor')
 
 def user_input_features():
     Loan_ID = st.text_input("Enter Loan Id")
-    Gender = st.selectbox('Gender', ('Male', 'Female', 'Other'))
+    Gender = st.selectbox('Gender', ('Male', 'Female'))
     Married = st.selectbox('Married', ('Yes', 'No'))
     Dependents = st.selectbox('Dependents', ('0', '1', '2', '3+'))
     Education = st.selectbox('Education', ('Graduate', 'Not Graduate'))
@@ -39,7 +39,7 @@ def user_input_features():
 
 input_df = user_input_features()
 
-input_df['Gender_Male'] = input_df['Gender_Male'].map({'Male': 1, 'Female': 0, 'Other': 2})
+input_df['Gender_Male'] = input_df['Gender_Male'].map({'Male': 1, 'Female': 0})
 input_df['Married_Yes'] = input_df['Married_Yes'].map({'Yes': 1, 'No': 0})
 input_df['Dependents'] = input_df['Dependents'].astype(str)
 dependents_dummies = pd.get_dummies(input_df['Dependents'], prefix='Dependents')
